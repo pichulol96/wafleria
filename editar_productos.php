@@ -1,0 +1,29 @@
+<?php
+    include "conexion.php";
+    $idproducto =$_POST['editar_idproducto'];
+    $nombre_producto =$_POST['editar_nombre_producto'];
+    $descripcion =$_POST['editar_descripcion'];
+    $precio =$_POST['editar_precio'];
+
+    if($nombre_producto == "" || $descripcion=="" || $precio==""){
+        echo json_encode("LLene todos los campos");
+        return;
+    }
+    else {
+        $query = "UPDATE productos set nombre = '$nombre_producto', descripcion = '$descripcion', precio = $precio
+        where idproducto = $idproducto";
+        $execute = mysqli_query($conexion,$query) or die(mysqli_error($conexion));
+        if($execute){
+            try {
+                echo json_encode("success");
+            }
+            catch (Exception $e) {
+                echo json_encode('Excepción capturada: ',  $e->getMessage(), "\n");
+            }
+        }
+        else {
+            echo json_encode("Hubo algun error al guardar el registro");
+        }
+    }
+
+?>

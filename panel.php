@@ -23,6 +23,9 @@
         #imgPreview{
             width:200px;
         }
+        #editar_imgPreview{
+            width:200px;
+        }
         textarea {
             height: 150px;
         }
@@ -73,7 +76,7 @@
                     <input type="text" name="precio" id="precio" class="form-control input" placeholder="Precio">
                     <select class="form-control" name="categoria" id="categoria">
                     </select>
-                    <input type="file" onchange="renderIMG()" id="imagen" name="imagen" placeholder="Imagen" class="input">
+                    <input type="file" onchange="renderIMG('registrar')" id="imagen" name="imagen" placeholder="Imagen" class="input">
                     </div>
 
                     <img id="imgPreview"/>
@@ -98,10 +101,14 @@
             <div class="modal-body">
                 <div class="row">
                 <form method="post" enctype="multipart/form-data" id ="frm-editar">
+                    <input hidden type="text" name="actual_imagen" id="actual_imagen" >
                     <input hidden type="text" name="editar_idproducto" id="editar_idproducto" >
                     <input type="text" name="editar_nombre_producto" id="editar_nombre_producto" class="form-control input" placeholder="Nombre del producto">
                     <textarea class="form-control" name="editar_descripcion" id="editar_descripcion" cols="30" rows="10" placeholder="Descripcion/Presentacion"></textarea>
                     <input type="text" name="editar_precio" id="editar_precio" class="form-control input" placeholder="Precio">
+                    <input type="file" onchange="renderIMG('editar')" id="editar_imagen" name="editar_imagen" placeholder="Imagen" class="input">
+
+                    <img id="editar_imgPreview"/>
                 </form>
                 </div>
             </div>
@@ -125,7 +132,7 @@
 
     async function postJSON(data) {
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/productos.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/productos.php", {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -179,6 +186,12 @@
         document.getElementById("editar_nombre_producto").value = producto;
         document.getElementById("editar_descripcion").value = descripcion;
         document.getElementById("editar_precio").value = precio;
+        document.getElementById("actual_imagen").value = img;
+
+        document.getElementById("editar_imagen").value= "";
+        let preview =document.getElementById("editar_imgPreview");
+        preview.src = `/wafleria/archivos/${img}`
+
         const myModal = new bootstrap.Modal('#editarModal', {
          keyboard: false
         })
@@ -202,7 +215,7 @@
     async function eliminar(idproducto,imagen){
         const producto = { idproducto,imagen };
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/eliminar_producto.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/eliminar_producto.php", {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -235,7 +248,7 @@
     }
 
     async function getCategorias() {
-        const response = await fetch("http://192.168.1.14/wafleria/categorias.php");
+        const response = await fetch("http://192.168.1.11/wafleria/categorias.php");
         const movies = await response.json();
         let categorias = document.getElementById("categoria");
         categorias.innerHTML +=`
@@ -256,7 +269,7 @@
         let formData = new FormData(frm);
         console.log(formData.get("categoria"));
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/registrar_productos.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/registrar_productos.php", {
             method: "POST", // or 'PUT'
             body: formData,
             });
@@ -291,7 +304,7 @@
         let frm = document.getElementById("frm-editar");
         let formData = new FormData(frm);
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/editar_productos.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/editar_productos.php", {
             method: "POST", // or 'PUT'
             body: formData,
             });
@@ -324,16 +337,29 @@
             console.error("Error:", error);
         }
     })
-    function renderIMG(){
-      let imagen = document.getElementById("imagen").files[0];
+    function renderIMG(text){
+      if(text == "editar") {
+        let imagen = document.getElementById("editar_imagen").files[0];
+        let preview =document.getElementById("editar_imgPreview");
+        renderIMGprev(imagen,preview);
+      }
+      if(text == "registrar") {
+        let imagen = document.getElementById("imagen").files[0];
+        let preview =document.getElementById("imgPreview");
+        renderIMGprev(imagen,preview);
+      }
+      //let imagen = document.getElementById("imagen").files[0];
+    }
+    function renderIMGprev(imagen,preview) {
       const reader = new FileReader();
       reader.addEventListener('load', (event) => {
-      document.getElementById("imgPreview").src = event.target.result;
+       preview.src = event.target.result;
       });
 
-         reader.readAsDataURL(imagen);
-         console.log(imagen);
+        reader.readAsDataURL(imagen);
+        console.log(imagen);
     }
+
     function buscarComida(text){
         let input = document.getElementById("buscar");
         const data = { text: input.value};

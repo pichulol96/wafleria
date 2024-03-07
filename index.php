@@ -142,7 +142,7 @@
 
     async function postJSON(data) {
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/productos.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/productos.php", {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -292,7 +292,7 @@
             } 
         } 
         try {
-            const response = await fetch("http://192.168.1.14/wafleria/impresion.php", {
+            const response = await fetch("http://192.168.1.11/wafleria/impresion.php", {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",

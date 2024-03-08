@@ -13,24 +13,35 @@
     use Mike42\Escpos\PrintConnectors\FilePrintConnector;
     use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
     date_default_timezone_set('America/Mexico_City');
-    $hoy = date("Y-m-d H:i:s");   
-    if($dataObject){
+    $hoy = date("Y-m-d H:i:s");  
+    if($dataObject->productos !=[]){
         $connector = new WindowsPrintConnector("POS-80C");
         $printer = new Printer($connector);
+        $logo = EscposImage::load("archivos/impre.jpg");
+        if($dataObject->mesa =="pedido")
+        {
+           $mesa =$dataObject->mesa;
+        }
+        if($dataObject->mesa !="pedido"){
+            $mesa = "Mesa: numero $dataObject->mesa";
+        }
+        //(dirname(FILE) . "/logo.png", false);
         //$printer -> text("$imagen\n");
         //$img = EscposImage::load("archivos/logo.png");
         //$printer -> graphics($img);
         $printer -> setTextSize(4,3);
         $printer -> setJustification(Printer::JUSTIFY_CENTER);
         $printer -> text("Waffleria\n\n\n");
+        $printer -> bitImage($logo);
         $printer -> setJustification(Printer::JUSTIFY_CENTER);
         $printer -> setTextSize(1,1);
         $printer -> text("Fecha: $hoy\n\n");
+        $printer -> text("$mesa\n\n");
         $printer -> setJustification(Printer::JUSTIFY_LEFT);
-        $printer -> text("Camida                             Precio   Cant\n\n");
+        $printer -> text("Comida                             Precio   Cant\n\n");
         $precio_total=0;
         $cantidad_total=0;
-        foreach($dataObject as $item ){
+        foreach($dataObject->productos  as $item ){
             //$productos=($item->producto);
             $printer -> setJustification(Printer::JUSTIFY_RIGHT);
             $printer -> text("$item->producto"."                  "."$item->precio"."     "."$item->cantidad\n");
@@ -53,6 +64,5 @@
         //$printer -> text("Gracias por su compra, vuelva pronto.\n\n");
         $printer -> cut();
         $printer -> close();
-    }
-    
+    } 
 ?>

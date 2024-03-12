@@ -17,7 +17,7 @@
     if($dataObject->productos !=[]){
         $connector = new WindowsPrintConnector("POS-80C");
         $printer = new Printer($connector);
-        $logo = EscposImage::load("archivos/impre.jpg");
+        //$logo = EscposImage::load("archivos/impre.jpg");
         if($dataObject->mesa =="pedido")
         {
            $mesa =$dataObject->mesa;
@@ -32,7 +32,7 @@
         $printer -> setTextSize(4,3);
         $printer -> setJustification(Printer::JUSTIFY_CENTER);
         $printer -> text("Waffleria\n\n\n");
-        $printer -> bitImage($logo);
+        //$printer -> bitImage($logo);
         $printer -> setJustification(Printer::JUSTIFY_CENTER);
         $printer -> setTextSize(1,1);
         $printer -> text("Fecha: $hoy\n\n");

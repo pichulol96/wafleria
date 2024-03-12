@@ -27,6 +27,10 @@
         margin-top:40px;
         background:#F4FA70;
     }
+    .card img {
+        width:350px;
+        height: 350px;
+    }
     .carrito{
         width: 20px;
         cursor:pointer;
@@ -179,7 +183,7 @@
                 for(let comida of result) {
                     cards.innerHTML +=`
                     <div class="card" style="width: 23rem; margin:auto; margin-top:20px;">
-                                <img src="archivos/${comida.img}" class="card-img-top" alt="...">
+                                <img src="archivos/${comida.img}" class="card-img-top img-fluid" alt="...">
                                 <div class="card-body">
                                     <h5 class="card-title">${comida.producto}</h5>
                                     <p class="card-text">${comida.descripcion}</p>
@@ -197,7 +201,7 @@
                 for(let comida of result) {
                 cards.innerHTML +=`
                 <div class="card" style="width: 23rem; margin:auto; margin-top:20px; ">
-                            <img src="archivos/${comida.img}" class="card-img-top" alt="...">
+                            <img src="archivos/${comida.img}" class="card-img-top img-fluid" alt="...">
                             <div class="card-body">
                                 <h5 class="card-title">${comida.producto}</h5>
                                 <p class="card-text">${comida.descripcion}</p>
@@ -335,7 +339,9 @@
         productos_carrito.map(function(obj){
             console.log(obj.id);
             tupla = document.getElementById(obj.id);
-            tupla.parentNode.removeChild(tupla);
+            if(tupla){
+                tupla.parentNode.removeChild(tupla);
+            }
         });
         let carrito = document.getElementById("contador");
         contador=0;

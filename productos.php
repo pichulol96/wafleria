@@ -13,8 +13,13 @@
         ON productos.id_categoria = categorias.idcategoria where productos.nombre LIKE '$dataObject->text%' order by categorias.nombre;"
     );
     $array = array();
+    $array2 = array();
     while($consulta = mysqli_fetch_array($result)){ 
         array_push($array, $consulta);
     }
-    echo json_encode($array);
+    foreach($array as $arra) {
+        $arra['descripcion']=utf8_decode($arra['descripcion']);
+        array_push($array2, $arra);
+    }
+    echo json_encode($array2);
 ?>

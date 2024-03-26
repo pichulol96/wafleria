@@ -1,3 +1,8 @@
+<?php
+include("IP.php");
+$objetoIP = new IP();
+$ip = $objetoIP->obtenerIP();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +33,10 @@
         }
         textarea {
             height: 150px;
+        }
+        .icon-save-categoria{
+            width:40px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -71,11 +80,35 @@
             <div class="modal-body">
                 <div class="row">
                 <form method="post" enctype="multipart/form-data" id ="frm-registrar">
+                    <div class="row">
+                      <div class="col-md-10">
+                        <select class="form-control" name="categoria" id="categoria">
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <img onclick="nuevaCategoria()" class="icon-save-categoria" src="/wafleria/archivos/save.svg" alt="">
+                      </div>
+                    </div>
+                    <br>
+
+                    <div class="card">
+                        <h5 class="card-header">Nueva categoria</h5>
+                        <div class="card-body">
+                            <p class="card-text">La nueva categoria a registrar no tiene que existir en la base de datos.</p>
+                            <div class="row">
+                                <div class="col-md-9">
+                                <input type="text" class="form-control" name="" id="">
+                                </div>
+                                <div class="col-md-3">
+                                <a href="#" class="btn btn-primary">Guardar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <input type="text" name="nombre_producto" id="nombre_producto" class="form-control input" placeholder="Nombre del producto">
                     <textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="10" placeholder="Descripcion/Presentacion"></textarea>
                     <input type="text" name="precio" id="precio" class="form-control input" placeholder="Precio">
-                    <select class="form-control" name="categoria" id="categoria">
-                    </select>
                     <input type="file" onchange="renderIMG('registrar')" id="imagen" name="imagen" placeholder="Imagen" class="input">
                     </div>
 
@@ -127,12 +160,13 @@
     var idContador =0 ;
     var productos_carrito = [];
     const data = { text: "" };
+    const ip = "<?php echo $ip;?>"
 
     postJSON(data);
 
     async function postJSON(data) {
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/productos.php", {
+            const response = await fetch(`http://${ip}/wafleria/productos.php`, {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -215,7 +249,7 @@
     async function eliminar(idproducto,imagen){
         const producto = { idproducto,imagen };
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/eliminar_producto.php", {
+            const response = await fetch(`http://${ip}/wafleria/eliminar_producto.php`, {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -248,7 +282,7 @@
     }
 
     async function getCategorias() {
-        const response = await fetch("http://192.168.1.11/wafleria/categorias.php");
+        const response = await fetch(`http://${ip}/wafleria/categorias.php`);
         const movies = await response.json();
         let categorias = document.getElementById("categoria");
         categorias.innerHTML +=`
@@ -269,7 +303,7 @@
         let formData = new FormData(frm);
         console.log(formData.get("categoria"));
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/registrar_productos.php", {
+            const response = await fetch(`http://${ip}/wafleria/registrar_productos.php`, {
             method: "POST", // or 'PUT'
             body: formData,
             });
@@ -304,7 +338,7 @@
         let frm = document.getElementById("frm-editar");
         let formData = new FormData(frm);
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/editar_productos.php", {
+            const response = await fetch(`http://${ip}/wafleria/editar_productos.php`, {
             method: "POST", // or 'PUT'
             body: formData,
             });

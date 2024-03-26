@@ -1,4 +1,8 @@
-
+<?php
+include("IP.php");
+$objetoIP = new IP();
+$ip = $objetoIP->obtenerIP();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,12 +161,13 @@
     var idContador =0 ;
     var productos_carrito = [];
     const data = { text: "" };
+    const ip = "<?php echo $ip;?>"
 
     postJSON(data);
 
     async function postJSON(data) {
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/productos.php", {
+            const response = await fetch(`http://${ip}/wafleria/productos.php`, {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",
@@ -319,7 +324,7 @@
             } 
         } 
         try {
-            const response = await fetch("http://192.168.1.11/wafleria/impresion.php", {
+            const response = await fetch(`http://${ip}/wafleria/impresion.php`, {
             method: "POST", // or 'PUT'
             headers: {
                 "Content-Type": "application/json",

@@ -32,8 +32,8 @@ $ip = $objetoIP->obtenerIP();
         background:#F4FA70;
     }
     .card img {
-        width:350px;
-        height: 350px;
+        /*width:350px;
+        height: 350px;*/
     }
     .carrito{
         width: 20px;

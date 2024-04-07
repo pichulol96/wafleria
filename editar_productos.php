@@ -4,6 +4,7 @@
     $nombre_producto =$_POST['editar_nombre_producto'];
     $descripcion =$_POST['editar_descripcion'];
     $precio =$_POST['editar_precio'];
+    $categoria = $_POST['editar_categoria'];
     $actual_imagen = $_POST['actual_imagen'];
 
     if($nombre_producto == "" || $descripcion=="" || $precio==""){
@@ -20,11 +21,11 @@
             }
             else {
                 $query = "UPDATE productos set nombre = '$nombre_producto', descripcion = '$descripcion', precio = $precio,
-                img = '$ruta' where idproducto = $idproducto";
+                img = '$ruta', id_categoria=$categoria where idproducto = $idproducto";
             }
         }
         if(!$nombre_imagen) {
-            $query = "UPDATE productos set nombre = '$nombre_producto', descripcion = '$descripcion', precio = $precio
+            $query = "UPDATE productos set nombre = '$nombre_producto', descripcion = '$descripcion', precio = $precio, id_categoria=$categoria
             where idproducto = $idproducto";
         }
         $execute = mysqli_query($conexion,$query) or die(mysqli_error($conexion));

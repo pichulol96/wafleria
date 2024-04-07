@@ -38,6 +38,18 @@ $ip = $objetoIP->obtenerIP();
             width:40px;
             cursor: pointer;
         }
+        .contenedor-categoria-hide{
+            display: none;
+        }
+        .contenedor-editar-categoria-hide{
+            display: none;
+        }
+        .contenedor-categoria-show{
+            display: block;
+        }
+        .contenedor-editar-categoria-show{
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -81,26 +93,46 @@ $ip = $objetoIP->obtenerIP();
                 <div class="row">
                 <form method="post" enctype="multipart/form-data" id ="frm-registrar">
                     <div class="row">
-                      <div class="col-md-10">
+                      <div class="col-md-6">
                         <select class="form-control" name="categoria" id="categoria">
                         </select>
                       </div>
                       <div class="col-md-2">
-                        <img onclick="nuevaCategoria()" class="icon-save-categoria" src="/wafleria/archivos/save.svg" alt="">
+                        <img onclick="showNuevaCategoria()" class="icon-save-categoria" src="/wafleria/archivos/save.svg" alt="">
+                      </div>
+                      <div class="col-md-2">
+                        <img onclick="showEditarCategoria()" class="icon-save-categoria" src="/wafleria/archivos/editar.svg" alt="">
+                      </div>
+                      <div class="col-md-2">
+                        <img onclick="showEliminarCategoria()" class="icon-save-categoria" src="/wafleria/archivos/icon_eliminar.svg" alt="">
                       </div>
                     </div>
-                    <br>
 
-                    <div class="card">
+                    <div id ="contenedor_categoria" class="card contenedor-categoria-hide">
                         <h5 class="card-header">Nueva categoria</h5>
                         <div class="card-body">
                             <p class="card-text">La nueva categoria a registrar no tiene que existir en la base de datos.</p>
                             <div class="row">
                                 <div class="col-md-9">
-                                <input type="text" class="form-control" name="" id="">
+                                <input type="text" class="form-control" name="nuevaCategoria" id="nuevaCategoria">
                                 </div>
                                 <div class="col-md-3">
-                                <a href="#" class="btn btn-primary">Guardar</a>
+                                <a href="#" onclick="saveNuevaCategoria()" class="btn btn-primary">Guardar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id ="contenedor_editar_categoria" class="card contenedor-editar-categoria-hide">
+                        <h5 class="card-header">Editar categoria</h5>
+                        <div class="card-body">
+                            <p class="card-text">La categoria a editar no tiene que existir en la base de datos.</p>
+                            <div class="row">
+                                <div class="col-md-9">
+                                <input type="text" class="form-control" name="editarCategoria" id="editarCategoria">
+                                </div>
+                                <div class="col-md-3">
+                                <a href="#" onclick="saveEditarCategoria()" class="btn btn-primary">Editar</a>
                                 </div>
                             </div>
                         </div>
@@ -136,6 +168,8 @@ $ip = $objetoIP->obtenerIP();
                 <form method="post" enctype="multipart/form-data" id ="frm-editar">
                     <input hidden type="text" name="actual_imagen" id="actual_imagen" >
                     <input hidden type="text" name="editar_idproducto" id="editar_idproducto" >
+                    <select class="form-control" name="editar_categoria" id="editar_categoria">
+                    </select>
                     <input type="text" name="editar_nombre_producto" id="editar_nombre_producto" class="form-control input" placeholder="Nombre del producto">
                     <textarea class="form-control" name="editar_descripcion" id="editar_descripcion" cols="30" rows="10" placeholder="Descripcion/Presentacion"></textarea>
                     <input type="text" name="editar_precio" id="editar_precio" class="form-control input" placeholder="Precio">
@@ -163,6 +197,7 @@ $ip = $objetoIP->obtenerIP();
     const ip = "<?php echo $ip;?>"
 
     postJSON(data);
+    getCategorias("categoria","");
 
     async function postJSON(data) {
         try {
@@ -216,12 +251,15 @@ $ip = $objetoIP->obtenerIP();
     }
 
     async function editar_confirm(idproducto,producto,descripcion,precio,img,categoria){
+        var categorias = document.querySelectorAll('#editar_categoria option');
+        categorias.forEach(o => o.remove());
+        getCategorias("editar_categoria",categoria);
         document.getElementById("editar_idproducto").value = idproducto;
         document.getElementById("editar_nombre_producto").value = producto;
         document.getElementById("editar_descripcion").value = descripcion;
         document.getElementById("editar_precio").value = precio;
         document.getElementById("actual_imagen").value = img;
-
+        
         document.getElementById("editar_imagen").value= "";
         let preview =document.getElementById("editar_imgPreview");
         preview.src = `/wafleria/archivos/${img}`
@@ -281,21 +319,27 @@ $ip = $objetoIP->obtenerIP();
         }   
     }
 
-    async function getCategorias() {
+    async function getCategorias(idcategoria,nombre) {
         const response = await fetch(`http://${ip}/wafleria/categorias.php`);
         const movies = await response.json();
-        let categorias = document.getElementById("categoria");
+        let categorias = document.getElementById(idcategoria);
         categorias.innerHTML +=`
                <option value="">Seleccionar Categoria</option>
             `
         movies.map(function suma(obj){
-            categorias.innerHTML +=`
+            if(nombre==obj.nombre){
+                categorias.innerHTML +=`
+               <option value="'${obj.idcategoria}'" selected>${obj.nombre}</option>
+            `
+            }
+            else {
+                categorias.innerHTML +=`
                <option value="'${obj.idcategoria}'">${obj.nombre}</option>
             `
+            }
         })
         //console.log(movies);
     }
-    getCategorias();
 
     document.getElementById("btn-guardar-producto").addEventListener('click',async (e)=>{
         e.preventDefault();
@@ -398,6 +442,172 @@ $ip = $objetoIP->obtenerIP();
         let input = document.getElementById("buscar");
         const data = { text: input.value};
         postJSON(data);
+    }
+    function showNuevaCategoria(){
+        document.getElementById('contenedor_categoria').classList.toggle("contenedor-categoria-hide");
+    }
+    async function saveNuevaCategoria(){
+        nueva_categoria = document.getElementById("nuevaCategoria").value;
+        if(nueva_categoria =="" || nueva_categoria == " " || nueva_categoria.length<4)
+        {
+            Swal.fire({
+                icon: "error",
+                title: "Ocurrio algun error",
+                text: "No se aceptan campos vacios, ademas la categoria debe ser mayor a 3 letras",
+            });
+        }
+        else {
+            try {
+            const response = await fetch(`http://${ip}/wafleria/registrar_categorias.php`, {
+            method: "POST", // or 'PUT'
+            body: JSON.stringify({categoria:nueva_categoria}),
+            });
+            const result = await response.json();
+            if(result=="success") {
+                //let categorias = document.getElementById("categoria");
+                var categorias = document.querySelectorAll('#categoria option');
+                categorias.forEach(o => o.remove());
+                getCategorias("categoria","");
+                Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Guardado!",
+                text: "La categoria se guardo correctamente!",
+                showConfirmButton: false,
+                timer: 2500
+                });
+                document.getElementById("nuevaCategoria").value="";
+                document.getElementById('contenedor_categoria').classList.toggle("contenedor-categoria-hide");
+
+            }
+            else {
+                Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Error!",
+                text: "Ocurrio un problema al guardar!",
+                showConfirmButton: false,
+                timer: 2500
+                });
+            }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    }
+    function showEditarCategoria(){
+        document.getElementById('contenedor_editar_categoria').classList.toggle("contenedor-editar-categoria-hide");
+    }
+    async function saveEditarCategoria(){
+        let select = document.getElementById("categoria").value;  
+        categoria = document.getElementById("editarCategoria").value;
+        if(categoria =="" || categoria == " " || categoria.length<4)
+        {
+            Swal.fire({
+                icon: "error",
+                title: "Ocurrio algun error",
+                text: "No se aceptan campos vacios, ademas la categoria debe ser mayor a 3 letras",
+            });
+        }
+        else {
+            try {
+            const response = await fetch(`http://${ip}/wafleria/editar_categorias.php`, {
+            method: "POST", // or 'PUT'
+            body: JSON.stringify({id:select,categoria:categoria}),
+            });
+            const result = await response.json();
+            if(result=="success") {
+                //let categorias = document.getElementById("categoria");
+                var categorias = document.querySelectorAll('#categoria option');
+                categorias.forEach(o => o.remove());
+                getCategorias("categoria","");
+                Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Guardado!",
+                text: "La categoria se edito correctamente!",
+                showConfirmButton: false,
+                timer: 2500
+                });
+                document.getElementById("editarCategoria").value="";
+                document.getElementById('contenedor_editar_categoria').classList.toggle("contenedor-editar-categoria-hide");
+
+            }
+            else {
+                Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Error!",
+                text: result,
+                showConfirmButton: false,
+                timer: 2500
+                });
+            }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    }
+    function showEliminarCategoria(){
+        let select = document.getElementById("categoria").value;  
+        if(select =="" || categoria == " ")
+        {
+            Swal.fire({
+                icon: "error",
+                title: "Ocurrio algun error",
+                text: "Seleccione la categoria que desea eliminar",
+            });
+            return
+        }
+        Swal.fire({
+        title: "Quieres eliminar la categoria?",
+        text: "La categoria sera borrada de sus registro!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, eliminar"
+        }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarCategoria(select)
+        }
+        });
+    }
+    async function eliminarCategoria(id){
+        try {
+            const response = await fetch(`http://${ip}/wafleria/eliminar_categorias.php`, {
+            method: "POST", // or 'PUT'
+            body: JSON.stringify({idcategoria:id}),
+            });
+            const result = await response.json();
+            if(result=="success") {
+                //let categorias = document.getElementById("categoria");
+                var categorias = document.querySelectorAll('#categoria option');
+                categorias.forEach(o => o.remove());
+                getCategorias("categoria","");
+                Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Guardado!",
+                text: "La categoria se elimino correctamente!",
+                showConfirmButton: false,
+                timer: 2500
+                });
+
+            }
+            else {
+                Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Error!",
+                text: result,
+                showConfirmButton: false,
+                timer: 2500
+                });
+            }
+            } catch (error) {
+                console.error("Error:", error);
+            }
     }
 </script>
 </html>

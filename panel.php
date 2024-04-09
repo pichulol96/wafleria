@@ -1,7 +1,5 @@
 <?php
-include("IP.php");
-$objetoIP = new IP();
-$ip = $objetoIP->obtenerIP();
+include("api/db/url_base.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -189,30 +187,22 @@ $ip = $objetoIP->obtenerIP();
 
     </div>
 </body>
+<script type="text/javascript" src="js/request.js"></script>
 <script>
     var contador = 0;
     var idContador =0 ;
     var productos_carrito = [];
     const data = { text: "" };
-    const ip = "<?php echo $ip;?>"
+    const url = "<?php echo $url;?>"
 
-    postJSON(data);
+    getProductos(data);
     getCategorias("categoria","");
 
-    async function postJSON(data) {
+    async function getProductos(data) {
         try {
-            const response = await fetch(`http://${ip}/wafleria/productos.php`, {
-            method: "POST", // or 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
+            const result = await request(`${url}/productos/productos.php`,data);
             productos_carrito = result;
             llenarTabla();
-            console.log(result);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -287,15 +277,7 @@ $ip = $objetoIP->obtenerIP();
     async function eliminar(idproducto,imagen){
         const producto = { idproducto,imagen };
         try {
-            const response = await fetch(`http://${ip}/wafleria/eliminar_producto.php`, {
-            method: "POST", // or 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(producto),
-            });
-
-            const result = await response.json();
+            const result = await request(`${url}/productos/eliminar_producto.php`,producto);
             if(result == "success"){
                 Swal.fire({
                 position: "top-end",
@@ -305,7 +287,7 @@ $ip = $objetoIP->obtenerIP();
                 showConfirmButton: false,
                 timer: 2500
                 });
-                postJSON(data)
+                getProductos(data)
             }
             else {
                 Swal.fire({
@@ -320,13 +302,12 @@ $ip = $objetoIP->obtenerIP();
     }
 
     async function getCategorias(idcategoria,nombre) {
-        const response = await fetch(`http://${ip}/wafleria/categorias.php`);
-        const movies = await response.json();
+        const result = await GetRequest(`${url}/categorias/categorias.php`);
         let categorias = document.getElementById(idcategoria);
         categorias.innerHTML +=`
                <option value="">Seleccionar Categoria</option>
             `
-        movies.map(function suma(obj){
+            result.map(function suma(obj){
             if(nombre==obj.nombre){
                 categorias.innerHTML +=`
                <option value="'${obj.idcategoria}'" selected>${obj.nombre}</option>
@@ -338,21 +319,16 @@ $ip = $objetoIP->obtenerIP();
             `
             }
         })
-        //console.log(movies);
+        //console.log(result);
     }
 
     document.getElementById("btn-guardar-producto").addEventListener('click',async (e)=>{
         e.preventDefault();
         let frm = document.getElementById("frm-registrar");
         let formData = new FormData(frm);
-        console.log(formData.get("categoria"));
+        console.log(formData);
         try {
-            const response = await fetch(`http://${ip}/wafleria/registrar_productos.php`, {
-            method: "POST", // or 'PUT'
-            body: formData,
-            });
-
-            const result = await response.json();
+            const result = await formDataRequest(`${url}/productos/registrar_productos.php`,formData);
             if(result == "success"){
                 Swal.fire({
                 position: "top-end",
@@ -364,7 +340,7 @@ $ip = $objetoIP->obtenerIP();
                 });
                 frm.reset();
                 document.getElementById("imgPreview").src = '';
-                postJSON(data)
+                getProductos(data)
             }
             else {
                 Swal.fire({
@@ -382,12 +358,7 @@ $ip = $objetoIP->obtenerIP();
         let frm = document.getElementById("frm-editar");
         let formData = new FormData(frm);
         try {
-            const response = await fetch(`http://${ip}/wafleria/editar_productos.php`, {
-            method: "POST", // or 'PUT'
-            body: formData,
-            });
-
-            const result = await response.json();
+            const result = await formDataRequest(`${url}/productos/editar_productos.php`,formData);
             if(result == "success"){
                 const truck_modal = document.querySelector('#editarModal');
                 const modal = bootstrap.Modal.getInstance(truck_modal);    
@@ -402,7 +373,7 @@ $ip = $objetoIP->obtenerIP();
                 timer: 2500
                 });
                 frm.reset();
-                postJSON(data);
+                getProductos(data);
             }
             else {
                 Swal.fire({
@@ -441,7 +412,7 @@ $ip = $objetoIP->obtenerIP();
     function buscarComida(text){
         let input = document.getElementById("buscar");
         const data = { text: input.value};
-        postJSON(data);
+        getProductos(data);
     }
     function showNuevaCategoria(){
         document.getElementById('contenedor_categoria').classList.toggle("contenedor-categoria-hide");
@@ -458,11 +429,8 @@ $ip = $objetoIP->obtenerIP();
         }
         else {
             try {
-            const response = await fetch(`http://${ip}/wafleria/registrar_categorias.php`, {
-            method: "POST", // or 'PUT'
-            body: JSON.stringify({categoria:nueva_categoria}),
-            });
-            const result = await response.json();
+            const data = {categoria:nueva_categoria}
+            const result = await request(`${url}/categorias/registrar_categorias.php`,data);
             if(result=="success") {
                 //let categorias = document.getElementById("categoria");
                 var categorias = document.querySelectorAll('#categoria option');
@@ -511,11 +479,8 @@ $ip = $objetoIP->obtenerIP();
         }
         else {
             try {
-            const response = await fetch(`http://${ip}/wafleria/editar_categorias.php`, {
-            method: "POST", // or 'PUT'
-            body: JSON.stringify({id:select,categoria:categoria}),
-            });
-            const result = await response.json();
+            const data = {id:select,categoria:categoria};
+            const result = await request(`${url}/categorias/editar_categorias.php`,data);   
             if(result=="success") {
                 //let categorias = document.getElementById("categoria");
                 var categorias = document.querySelectorAll('#categoria option');
@@ -575,11 +540,8 @@ $ip = $objetoIP->obtenerIP();
     }
     async function eliminarCategoria(id){
         try {
-            const response = await fetch(`http://${ip}/wafleria/eliminar_categorias.php`, {
-            method: "POST", // or 'PUT'
-            body: JSON.stringify({idcategoria:id}),
-            });
-            const result = await response.json();
+            const data = {idcategoria:id};
+            const result = await request(`${url}/categorias/eliminar_categorias.php`,data);   
             if(result=="success") {
                 //let categorias = document.getElementById("categoria");
                 var categorias = document.querySelectorAll('#categoria option');

@@ -1,5 +1,5 @@
 <?php
-    include "conexion.php";
+    include "../db/conexion.php";
     $JSONData = file_get_contents("php://input");
     $dataObject = json_decode($JSONData);
     if($dataObject->categoria == "" || $dataObject->categoria == " " || strlen($dataObject->categoria)<4){

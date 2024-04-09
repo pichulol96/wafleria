@@ -1,7 +1,5 @@
 <?php
-include("IP.php");
-$objetoIP = new IP();
-$ip = $objetoIP->obtenerIP();
+include("api/db/url_base.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,38 +154,50 @@ $ip = $objetoIP->obtenerIP();
 
     </div>
 </body>
+<script type="text/javascript" src="js/request.js"></script>
 <script>
     var contador = 0;
     var idContador =0 ;
     var productos_carrito = [];
     const data = { text: "" };
-    const ip = "<?php echo $ip;?>"
+    const url = "<?php echo $url;?>"
 
-    postJSON(data);
+    getProductos(data);
 
-    async function postJSON(data) {
+    async function getProductos(data) {
         try {
-            const response = await fetch(`http://${ip}/wafleria/productos.php`, {
-            method: "POST", // or 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
-            let cards = document.getElementById("cards");
-            if(cards == null) {
-                var newDiv = document.createElement("div");
-                var currentDiv = document.getElementById("cont");
-                newDiv.setAttribute("id","cards");
-                newDiv.setAttribute("class","row");
-                currentDiv.parentNode.insertBefore(newDiv, currentDiv);
+            const result = await request(`${url}/productos/productos.php`,data);
+            if(result){
                 let cards = document.getElementById("cards");
-                let id=0;
-                for(let comida of result) {
+                if(cards == null) {
+                    var newDiv = document.createElement("div");
+                    var currentDiv = document.getElementById("cont");
+                    newDiv.setAttribute("id","cards");
+                    newDiv.setAttribute("class","row");
+                    currentDiv.parentNode.insertBefore(newDiv, currentDiv);
+                    let cards = document.getElementById("cards");
+                    let id=0;
+                    for(let comida of result) {
+                        cards.innerHTML +=`
+                        <div class="card" style="width: 23rem; margin:auto; margin-top:20px;">
+                                    <img src="archivos/${comida.img}" class="card-img-top img-fluid" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${comida.producto}</h5>
+                                        <p class="card-text">${comida.descripcion}</p>
+                                        <p class="card-text">$${comida.precio}</p>
+                                        <button id="button${id}" type="button" class="btn btn-primary agregar_producto" onclick="agregarProducto('${comida.producto}','${comida.precio}','button${id}')">Agregar</button>
+                                    </div>
+                                </div>
+                        `;
+                        id++;
+                    }
+                    return
+                }
+                else {
+                    let id=0;
+                    for(let comida of result) {
                     cards.innerHTML +=`
-                    <div class="card" style="width: 23rem; margin:auto; margin-top:20px;">
+                    <div class="card" style="width: 23rem; margin:auto; margin-top:20px; ">
                                 <img src="archivos/${comida.img}" class="card-img-top img-fluid" alt="...">
                                 <div class="card-body">
                                     <h5 class="card-title">${comida.producto}</h5>
@@ -199,24 +209,7 @@ $ip = $objetoIP->obtenerIP();
                     `;
                     id++;
                 }
-                return
-            }
-            else {
-                let id=0;
-                for(let comida of result) {
-                cards.innerHTML +=`
-                <div class="card" style="width: 23rem; margin:auto; margin-top:20px; ">
-                            <img src="archivos/${comida.img}" class="card-img-top img-fluid" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">${comida.producto}</h5>
-                                <p class="card-text">${comida.descripcion}</p>
-                                <p class="card-text">$${comida.precio}</p>
-                                <button id="button${id}" type="button" class="btn btn-primary agregar_producto" onclick="agregarProducto('${comida.producto}','${comida.precio}','button${id}')">Agregar</button>
-                            </div>
-                        </div>
-                `;
-                id++;
-            }
+                }
             }
         } catch (error) {
             console.error("Error:", error);
@@ -229,7 +222,7 @@ $ip = $objetoIP->obtenerIP();
         cards.parentNode.removeChild(cards);
         //console.log(input.value);
         const data = { text: input.value};
-        postJSON(data);
+        getProductos(data);
     }
     function agregarProducto(producto,precio,id) {
         
@@ -324,14 +317,8 @@ $ip = $objetoIP->obtenerIP();
             } 
         } 
         try {
-            const response = await fetch(`http://${ip}/wafleria/impresion.php`, {
-            method: "POST", // or 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({productos:agrupado2, mesa}),
-            });
-            const result = await response.json();
+            const data = {productos:agrupado2, mesa}
+            const result = await request(`${url}/impresion/impresion.php`,data);
             console.log(result);
         } catch (error) {
             console.error("Error:", error);

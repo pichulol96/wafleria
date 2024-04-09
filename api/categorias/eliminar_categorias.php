@@ -5,14 +5,13 @@
     header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
     header('content-type: application/json; charset=utf-8');
-    include "conexion.php";
+    include "../db/conexion.php";
      try {
         $result = mysqli_query(
-            $conexion,"DELETE from productos where idproducto = $dataObject->idproducto ;"
+            $conexion,"DELETE from categorias where idcategoria = $dataObject->idcategoria ;"
         );
         $exito = mysqli_affected_rows($conexion);
         if($exito>0){
-            unlink('archivos/'.$dataObject->imagen);
             echo json_encode("success");
         }
         else{

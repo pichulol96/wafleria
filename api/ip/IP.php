@@ -1,7 +1,7 @@
 <?php
     class IP{
         public function obtenerIP(){
-            include "conexion.php";
+            include "api/db/conexion.php";
             $result = mysqli_query(
                 $conexion,"SELECT descripcion_config FROM config where tipo_config = 'ip';");
             $ip;

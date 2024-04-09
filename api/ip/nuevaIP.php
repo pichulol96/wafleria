@@ -1,6 +1,6 @@
 <?php
-include("api/ip/IP.php");
-include "api/db/conexion.php";
+include("IP.php");
+include "conexion.php";
 $objetoIP = new IP();
 $ip =$objetoIP->nuevaIP();
 

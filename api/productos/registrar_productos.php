@@ -1,5 +1,5 @@
 <?php
-    include "conexion.php";
+    include "../db/conexion.php";
     $nombre_producto =$_POST['nombre_producto'];
     $descripcion =$_POST['descripcion'];
     $precio =$_POST['precio'];
@@ -18,7 +18,7 @@
         if($execute){
             try {
                 $temporal = $_FILES['imagen']['tmp_name'];
-                $carpeta = "archivos";
+                $carpeta = "../../archivos";
                 move_uploaded_file($temporal,$carpeta.'/'.$nombre_imagen);
                 echo json_encode("success");
             }

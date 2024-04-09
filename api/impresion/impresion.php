@@ -6,7 +6,7 @@
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
     header('content-type: application/json; charset=utf-8');
     /* Call this file 'hello-world.php' */
-    require __DIR__ . '/vendor/autoload.php';
+    require __DIR__ . '../../../vendor/autoload.php';
     //$imagen= include("archivos/logo.png");
     use Mike42\Escpos\Printer;
     use Mike42\Escpos\EscposImage;

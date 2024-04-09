@@ -1,5 +1,5 @@
 <?php
-    include "conexion.php";
+    include "../db/conexion.php";
     $idproducto =$_POST['editar_idproducto'];
     $nombre_producto =$_POST['editar_nombre_producto'];
     $descripcion =$_POST['editar_descripcion'];
@@ -33,8 +33,8 @@
             try {
                 if($nombre_imagen){
                     $temporal = $_FILES['editar_imagen']['tmp_name'];
-                    $carpeta = "archivos";
-                    unlink('archivos/'.$actual_imagen);
+                    $carpeta = "../../archivos";
+                    unlink('../../archivos/'.$actual_imagen);
                     move_uploaded_file($temporal,$carpeta.'/'.$nombre_imagen);
                 }
                 echo json_encode("success");
